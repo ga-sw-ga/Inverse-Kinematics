@@ -240,6 +240,18 @@ int main(void) {
 	mainloop(std::move(window), [&](float dt /**** Time since last frame ****/) {
         stopwatch += dt;
 
+        // Reset to pose
+        if (imgui_panel::reset_pose) {
+            arm.resetToRest();
+            imgui_panel::joint_angles = std::array<float, 4>{0.f, 0.f, 0.f, 0.f};
+            imgui_panel::reset_pose = false;
+        }
+
+        lambda = imgui_panel::lambda;
+        position_epsilon = imgui_panel::stopping_distance;
+        angle_epsilon = imgui_panel::finite_angle_step;
+        delta = imgui_panel::project_distance;
+
 		// ----- Target ----- //
 		//Simple function to animate the target in a interesting fashion
 		if (imgui_panel::animate_target) {
@@ -289,8 +301,12 @@ int main(void) {
                 e_delta_t = project(e_t, e, delta);
                 delta_e = e_delta_t - e;
                 j_theta = jacobian(arm, theta, angle_epsilon);
-                delta_theta = solve_delta_theta_dls(j_theta, delta_e, lambda);
-//                delta_theta = solve_delta_theta_jt(j_theta, delta_e);
+                if (imgui_panel::isBonus) {
+                    delta_theta = solve_delta_theta_dls(j_theta, delta_e, lambda);
+                }
+                else {
+                    delta_theta = solve_delta_theta_jt(j_theta, delta_e);
+                }
                 theta += delta_theta;
                 arm.angles = vec4_to_array(theta);
                 iteration++;

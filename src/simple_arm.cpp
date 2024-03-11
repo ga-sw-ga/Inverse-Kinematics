@@ -161,4 +161,13 @@ namespace rigging {
         return globalJointM(index);
     }
 
+    // Function to reset the arm to its rest position
+    void SimpleArm::resetToRest() {
+        // Reset angles to their initial values
+        angles = std::array<float, 4>{0.f, 0.f, 0.f, 0.f};
+
+        // Apply constraints to ensure angles are within bounds
+        applyConstraints();
+    }
+
 } // namespace rigging

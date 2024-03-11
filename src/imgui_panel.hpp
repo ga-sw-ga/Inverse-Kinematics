@@ -5,22 +5,34 @@
 #include <imgui/imgui.h>
 
 namespace imgui_panel {
-	extern bool showPanel;
-	extern ImVec4 clear_color;
+    extern bool showPanel;
+    extern ImVec4 clear_color;
 
-	// rig
-	extern std::array<float, 3> bone_lengths; //Will need to change this after adding the bone
-	extern std::array<float, 4> joint_angles; //Will need to change this after adding the joint
+    // rig
+    extern std::array<float, 3> bone_lengths;
+    extern std::array<float, 4> joint_angles;
 
-	// kinematics
-	extern bool isIK;
+    // bonus
+    extern bool isBonus;
 
-	// skinning
-	extern bool isLBS;
+    // kinematics
+    extern bool isIK;
 
-	// animation
-	extern bool animate_target;
+    // skinning
+    extern bool isLBS;
 
-	// lambda function
-	extern std::function<void(void)> draw;
+    // animation
+    extern bool animate_target;
+
+    // reset pose
+    extern bool reset_pose;
+
+    // New parameters for additional features
+    extern float finite_angle_step;
+    extern float project_distance;
+    extern float stopping_distance;
+    extern float lambda;
+
+    // lambda function
+    extern std::function<void(void)> draw;
 } // namespace panel

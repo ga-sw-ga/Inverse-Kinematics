@@ -73,6 +73,8 @@ namespace rigging {
 
         glm::mat4 getJointPosedTransform(size_t index) const;
         glm::mat4 getJointRestTransform(size_t index) const;
+
+        void resetToRest();
         // Ensure angles are preserved in the proper range
 		void applyConstraints();
 

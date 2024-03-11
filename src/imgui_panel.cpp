@@ -1,25 +1,37 @@
 #include "imgui_panel.hpp"
 
 namespace imgui_panel {
-	// default values
-	bool showPanel = true;
-	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    // default values
+    bool showPanel = true;
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-	// rig
-	std::array<float, 3> bone_lengths = { 5.f, 5.f, 5.f };
-	std::array<float, 4> joint_angles = { 0.f, 0.f, 0.f, 0.f };
+    // rig
+    std::array<float, 3> bone_lengths = { 5.f, 5.f, 5.f };
+    std::array<float, 4> joint_angles = { 0.f, 0.f, 0.f, 0.f };
 
-	//Kinematics
-	bool isIK = false;
+    // Bonus content
+    bool isBonus = false;
 
-	// skinning
-	bool isLBS = false;
+    //Kinematics
+    bool isIK = false;
 
-	// animation
-	bool animate_target = false;
+    // skinning
+    bool isLBS = false;
 
-	std::function<void(void)> draw = [](void) {
-		if (showPanel && ImGui::Begin("Panel", &showPanel, ImGuiWindowFlags_MenuBar)) {
+    // animation
+    bool animate_target = false;
+
+    // reset pose
+    bool reset_pose = false;
+
+    // New parameters for additional features
+    float finite_angle_step = 0.01f;
+    float project_distance = 0.01f;
+    float stopping_distance = 0.05f;
+    float lambda = 0.1f;
+
+    std::function<void(void)> draw = [](void) {
+        if (showPanel && ImGui::Begin("Panel", &showPanel, ImGuiWindowFlags_MenuBar)) {
 			ImGui::Spacing();
 
 			ImGui::Text(
@@ -35,15 +47,46 @@ namespace imgui_panel {
 
 			ImGui::ColorEdit3("Clear color", (float*)&clear_color);
 
+            ImGui::Spacing();
+            ImGui::Separator();
+
+            // Enable Bonus Content checkbox
+            ImGui::Checkbox("Enable Bonus Content", &isBonus);
+
 			ImGui::Spacing();
 			ImGui::Separator();
 
 			ImGui::Checkbox("Animate Target Override", &animate_target);
 			ImGui::Checkbox("Use Inverse Kinematics", &isIK);
+
+            // Lambda
+            if (isBonus && isIK) {
+                ImGui::SliderFloat("Lambda", &lambda, 0.01f, 1.0f);
+            }
+
+            // Finite Angle Step (h_theta)
+            if (isIK) {
+                ImGui::SliderFloat("Finite Angle Step (h_theta)", &finite_angle_step, 0.001f, 0.1f);
+            }
+
+            // Project Distance (delta)
+            if (isIK) {
+                ImGui::SliderFloat("Project Distance (delta)", &project_distance, 0.001f, 0.1f);
+            }
+
+            // Stopping Distance (eps)
+            if (isIK) {
+                ImGui::SliderFloat("Stopping Distance (eps)", &stopping_distance, 0.01f, 1.f);
+            }
+
 			ImGui::Checkbox("Use Skinning Model", &isLBS);
 
 			ImGui::Spacing();
 			ImGui::Separator();
+
+            if (ImGui::Button("Reset to Rest")) {
+                reset_pose = true;
+            }
 
 			// Model has a specific bone length to use and thus the input should be disabled
 			if (!isLBS) {
