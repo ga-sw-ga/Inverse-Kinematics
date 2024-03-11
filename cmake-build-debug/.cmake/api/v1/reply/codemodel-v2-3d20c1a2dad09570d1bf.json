@@ -100,14 +100,14 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "a3_base::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-a3_base-Debug-bb526c0762fbed726c59.json",
+					"jsonFile" : "target-a3_base-Debug-0e4c7f216773a024a826.json",
 					"name" : "a3_base",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 2,
 					"id" : "glfw::@9d94ad66e13f8aab41f7",
-					"jsonFile" : "target-glfw-Debug-e23c21b83590c13db74b.json",
+					"jsonFile" : "target-glfw-Debug-307c1d8e3d4f1d38d42a.json",
 					"name" : "glfw",
 					"projectIndex" : 1
 				},
@@ -131,8 +131,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "D:/30220749/Courses/Computer Animation/Assignment 3/Assignment 03 - Base Code/cmake-build-debug",
-		"source" : "D:/30220749/Courses/Computer Animation/Assignment 3/Assignment 03 - Base Code"
+		"build" : "D:/30220749/Courses/Computer Animation/Assignment 3/Inverse-Kinematics/cmake-build-debug",
+		"source" : "D:/30220749/Courses/Computer Animation/Assignment 3/Inverse-Kinematics"
 	},
 	"version" : 
 	{

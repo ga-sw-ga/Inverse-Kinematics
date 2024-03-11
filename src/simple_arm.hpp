@@ -69,7 +69,11 @@ namespace rigging {
 		glm::mat4 globalJointM(size_t index) const;
 		glm::mat4 globalEndEffectorM() const;
 
-		// Ensure angles are preserved in the proper range
+        glm::vec3 calculateEndEffectorPosition(const glm::vec4& theta) const;
+
+        glm::mat4 getJointPosedTransform(size_t index) const;
+        glm::mat4 getJointRestTransform(size_t index) const;
+        // Ensure angles are preserved in the proper range
 		void applyConstraints();
 
 		// Generate cylinders to render the arm

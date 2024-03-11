@@ -916,8 +916,8 @@
 	"kind" : "cmakeFiles",
 	"paths" : 
 	{
-		"build" : "D:/30220749/Courses/Computer Animation/Assignment 3/Assignment 03 - Base Code/cmake-build-debug",
-		"source" : "D:/30220749/Courses/Computer Animation/Assignment 3/Assignment 03 - Base Code"
+		"build" : "D:/30220749/Courses/Computer Animation/Assignment 3/Inverse-Kinematics/cmake-build-debug",
+		"source" : "D:/30220749/Courses/Computer Animation/Assignment 3/Inverse-Kinematics"
 	},
 	"version" : 
 	{

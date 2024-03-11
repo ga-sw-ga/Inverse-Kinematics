@@ -3,6 +3,8 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/transform.hpp>
+#include <cmath>
+#include <limits>
 
 #include "picking_controls.h"
 #include "turntable_controls.h"
@@ -11,6 +13,10 @@
 #include "simple_arm.hpp"
 #include "skinned_model.hpp"
 
+#include <glm/gtx/string_cast.hpp>
+#include <thread>
+#include <chrono>
+
 using namespace giv;
 using namespace giv::io;
 using namespace givr;
@@ -18,8 +24,132 @@ using namespace givr::camera;
 using namespace givr::geometry;
 using namespace givr::style;
 
+
+glm::mat4x3 multiply_mat4_by_mat4x3(const glm::mat4& mat4x4, const glm::mat4x3& mat4x3) {
+    glm::mat4x3 result;
+
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            result[i][j] = 0.f;
+            for (int k = 0; k < 4; ++k) {
+                result[i][j] += mat4x4[i][k] * mat4x3[k][j];
+            }
+        }
+    }
+
+    return result;
+}
+
+glm::vec4 multiply_mat4x3_by_vec3(const glm::mat4x3& mat4x3, const glm::vec3& vec3) {
+    glm::vec4 result;
+
+    for (int i = 0; i < 4; ++i) {
+        result[i] = 0.f;
+        for (int j = 0; j < 3; ++j) {
+            result[i] += mat4x3[i][j] * vec3[j];
+        }
+    }
+
+    return result;
+}
+
+
+glm::vec3 project(glm::vec3 e_t, glm::vec3 e, float delta) {
+    glm::vec3 d = e_t - e;
+    float l = glm::length(d);
+    if (l > delta) {
+        return e + (delta / l) * d;
+    }
+    else {
+        return e_t;
+    }
+}
+
+
+glm::mat3x4 jacobian(rigging::SimpleArm& arm, const glm::vec4& angle, const float epsilon) {
+    glm::mat3x4 jac = glm::mat3x4();
+    glm::vec4 e = glm::vec4(0.f, 0.f, 0.f, 0.f);
+    for (int j = 0; j < 4; j++) {
+        e = glm::vec4(0.f, 0.f, 0.f, 0.f);
+        e[j] = epsilon;
+        glm::vec4 theta_plus_epsilon = angle + e;
+        glm::vec4 theta_minus_epsilon = angle - e;
+        glm::vec3 p_plus_theta = arm.calculateEndEffectorPosition(theta_plus_epsilon);
+        glm::vec3 p_minus_theta = arm.calculateEndEffectorPosition(theta_minus_epsilon);
+        glm::vec3 d_f_over_d_theta = (p_plus_theta - p_minus_theta) / (2.f * epsilon);
+        for (int i = 0; i < 3; i++) {
+            jac[i][j] = d_f_over_d_theta[i];
+        }
+    }
+    return jac;
+}
+
+// Damped (λ) least squares method
+glm::vec4 solve_delta_theta_dls(const glm::mat3x4& j_theta, const glm::vec3& delta_e, const float& lambda) {
+    glm::vec4 delta_theta;
+
+    glm::mat4x3 j_theta_t = glm::transpose(j_theta);
+    glm::mat4 j_theta_t_times_j_theta = j_theta_t * j_theta;
+    glm::mat4 lambda_squared_times_identity = (lambda * lambda) * glm::identity<glm::mat4>();
+    glm::mat4 term_inside_parentheses = j_theta_t_times_j_theta + lambda_squared_times_identity;
+    glm::mat4 inverse_term = glm::inverse(term_inside_parentheses);
+    glm::mat4x3 inverse_term_times_j_theta_t = multiply_mat4_by_mat4x3(inverse_term, j_theta_t);
+    delta_theta = multiply_mat4x3_by_vec3(inverse_term_times_j_theta_t, delta_e);
+
+    return delta_theta;
+}
+
+
+glm::vec4 solve_delta_theta_jt(const glm::mat3x4& j_theta, const glm::vec3& delta_e) {
+    glm::vec4 delta_theta;
+
+    glm::mat4x3 j_theta_t = glm::transpose(j_theta);
+    glm::mat3 j_theta_times_j_theta_t = j_theta * j_theta_t;
+    glm::vec3 j_theta_times_j_theta_t_times_delta_e = j_theta_times_j_theta_t * delta_e;
+    float alpha = glm::dot(delta_e, j_theta_times_j_theta_t_times_delta_e) / glm::dot(j_theta_times_j_theta_t_times_delta_e, j_theta_times_j_theta_t_times_delta_e);
+    delta_theta = alpha * multiply_mat4x3_by_vec3(j_theta_t, delta_e);
+
+    return delta_theta;
+}
+
+
+std::array<float, 4> vec4_to_array(const glm::vec4 vector) {
+    return { vector.x, vector.y, vector.z, vector.w };
+}
+
+
 // program entry point
 int main(void) {
+    // important variables initialized
+    glm::vec3 e, e_t, e_delta_t, delta_e;
+    glm::vec4 theta = glm::vec4(0.f, 0.f, 0.f, 0.f);
+    glm::vec4 delta_theta = glm::vec4(0.f, 0.f, 0.f, 0.f);
+    glm::mat3x4 j_theta = glm::mat3x4(1.f);
+    float angle_epsilon = 0.01f, delta = 0.01f, lambda = 0.1f, position_epsilon = 0.05f, stopwatch = 0.f;
+
+    // skinning
+    std::array<glm::mat4, 3> jointRestTransforms{
+            glm::mat4(1.0f), // Identity matrix for joint 0
+            glm::mat4(1.0f), // Identity matrix for joint 1
+            glm::mat4(1.0f)  // Identity matrix for joint 2
+    };
+
+    std::array<glm::mat4, 3> jointPosedTransforms{
+            glm::mat4(1.0f), // Identity matrix for joint 0
+            glm::mat4(1.0f), // Identity matrix for joint 1
+            glm::mat4(1.0f)  // Identity matrix for joint 2
+    };
+
+
+    // benchmark
+//    int benchmark_index = 0;
+//    bool change_benchmark = true;
+//    glm::vec3 benchmark_positions[5] = {glm::vec3(5.f, 5.f, 5.f),
+//                                        glm::vec3(-5.f, 5.f, 0.f),
+//                                        glm::vec3(5.f, 5.f, -5.f),
+//                                        glm::vec3(5.f, 6.f, 5.f),
+//                                        glm::vec3(3.f, 6.f, -4.f)};
+
 	// initialize OpenGL and window
 	GLFWContext glContext;
 	glContext.glMajorVesion(3)
@@ -108,6 +238,7 @@ int main(void) {
 
 	// main loop
 	mainloop(std::move(window), [&](float dt /**** Time since last frame ****/) {
+        stopwatch += dt;
 
 		// ----- Target ----- //
 		//Simple function to animate the target in a interesting fashion
@@ -126,7 +257,14 @@ int main(void) {
 				0.f - 3.f * std::sin(.5f * M_PI * t)
 			};
 		}
-		//Move the target in the view plane by tracking the curser
+
+        // For benchmark
+//        if (change_benchmark && benchmark_index < 5) {
+//            target = benchmark_positions[benchmark_index];
+//            change_benchmark = false;
+//            benchmark_index++;
+//        }
+        //Move the target in the view plane by tracking the curser
 		else if (follow_mouse) {
 			glm::mat4 MVP = view.projection.projectionMatrix() * view.camera.viewMatrix();
 			glm::mat4 invMVP = inverse(MVP);
@@ -137,10 +275,32 @@ int main(void) {
 				invMVP, normalized_coordinates.z
 			);
 		}
+        e_t = target;
+        e = arm.endEffectorPosition();
+        theta = glm::vec4(arm.angles[0], arm.angles[1], arm.angles[2], arm.angles[3]);
 
 		// ----- Kinematics ----- //
 		if (imgui_panel::isIK) {
 			//TO-DO: your IK process(s) should be here
+            int iteration = 0;
+            while (glm::length(e_t - e) > position_epsilon && iteration < 100) {
+                e = arm.endEffectorPosition();
+                e_t = target;
+                e_delta_t = project(e_t, e, delta);
+                delta_e = e_delta_t - e;
+                j_theta = jacobian(arm, theta, angle_epsilon);
+                delta_theta = solve_delta_theta_dls(j_theta, delta_e, lambda);
+//                delta_theta = solve_delta_theta_jt(j_theta, delta_e);
+                theta += delta_theta;
+                arm.angles = vec4_to_array(theta);
+                iteration++;
+            }
+            // for benchmark
+//            if (glm::length(e_t - e) <= position_epsilon && !change_benchmark) {
+//                change_benchmark = true;
+//                std::cout << "Benchmark " << benchmark_index << " Completed!\nTime: " << stopwatch << "\n";
+//            }
+
 			arm.applyConstraints();//Called somewhere in here
 		}
 		else {
@@ -159,7 +319,14 @@ int main(void) {
 			arm.lengths[2] = model.bones[2].length;
 			imgui_panel::bone_lengths = arm.lengths;
 
-			//TO-DO: Calculate tranformations to use below in Update 
+			//TO-DO: Calculate tranformations to use below in Update
+            for (size_t i = 0; i < arm.number_of_joints; ++i) {
+                // Joint rest transform
+                jointRestTransforms[i] = arm.getJointRestTransform(i);
+
+                // Joint posed transform
+                jointPosedTransforms[i] = arm.getJointPosedTransform(i);
+            }
 		}
 		else {
 			arm.lengths = imgui_panel::bone_lengths;
@@ -175,8 +342,8 @@ int main(void) {
 		if (imgui_panel::isLBS) {
 			model.updateMesh(
 				model_geometry,
-				{/*TODO: Define the joint rest transformation*/},
-				{/*TODO: Define the joint posed transformation*/}
+				{jointRestTransforms[0], jointRestTransforms[1], jointRestTransforms[2]},
+				{jointPosedTransforms[0], jointPosedTransforms[1], jointPosedTransforms[2]}
 			);
 			updateRenderable(model_geometry, model_style, model_render);
 			draw(model_render, view, glm::mat4(1.f));
@@ -198,7 +365,6 @@ int main(void) {
 		draw(spheres_renders, view);//Also the joints and end effector
 
 		draw(plate_render, view, glm::scale(glm::vec3(arm.lengths[0])));
-
 	});
 	return EXIT_SUCCESS;
 }

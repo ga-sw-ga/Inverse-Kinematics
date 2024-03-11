@@ -133,27 +133,27 @@
 			[
 				{
 					"backtrace" : 8,
-					"path" : "D:/30220749/Courses/Computer Animation/Assignment 3/Assignment 03 - Base Code/cmake-build-debug"
+					"path" : "D:/30220749/Courses/Computer Animation/Assignment 3/Inverse-Kinematics/cmake-build-debug"
 				},
 				{
 					"backtrace" : 8,
-					"path" : "D:/30220749/Courses/Computer Animation/Assignment 3/Assignment 03 - Base Code/libs"
+					"path" : "D:/30220749/Courses/Computer Animation/Assignment 3/Inverse-Kinematics/libs"
 				},
 				{
 					"backtrace" : 8,
-					"path" : "D:/30220749/Courses/Computer Animation/Assignment 3/Assignment 03 - Base Code/src"
+					"path" : "D:/30220749/Courses/Computer Animation/Assignment 3/Inverse-Kinematics/src"
 				},
 				{
 					"backtrace" : 9,
-					"path" : "D:/30220749/Courses/Computer Animation/Assignment 3/Assignment 03 - Base Code/libs/glfw/include"
+					"path" : "D:/30220749/Courses/Computer Animation/Assignment 3/Inverse-Kinematics/libs/glfw/include"
 				},
 				{
 					"backtrace" : 10,
-					"path" : "D:/30220749/Courses/Computer Animation/Assignment 3/Assignment 03 - Base Code/libs/glfw/src"
+					"path" : "D:/30220749/Courses/Computer Animation/Assignment 3/Inverse-Kinematics/libs/glfw/src"
 				},
 				{
 					"backtrace" : 10,
-					"path" : "D:/30220749/Courses/Computer Animation/Assignment 3/Assignment 03 - Base Code/cmake-build-debug/libs/glfw/src"
+					"path" : "D:/30220749/Courses/Computer Animation/Assignment 3/Inverse-Kinematics/cmake-build-debug/libs/glfw/src"
 				}
 			],
 			"language" : "C",

@@ -1,4 +1,4 @@
-# Install script for directory: D:/30220749/Courses/Computer Animation/Assignment 3/Assignment 03 - Base Code/libs/glfw/src
+# Install script for directory: D:/30220749/Courses/Computer Animation/Assignment 3/Inverse-Kinematics/libs/glfw/src
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -38,6 +38,6 @@ if(NOT DEFINED CMAKE_OBJDUMP)
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "D:/30220749/Courses/Computer Animation/Assignment 3/Assignment 03 - Base Code/cmake-build-debug/libs/glfw/src/libglfw3.a")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "D:/30220749/Courses/Computer Animation/Assignment 3/Inverse-Kinematics/cmake-build-debug/libs/glfw/src/libglfw3.a")
 endif()
 

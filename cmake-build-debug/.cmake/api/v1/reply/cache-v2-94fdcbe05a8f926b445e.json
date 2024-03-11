@@ -67,7 +67,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "d:/30220749/Courses/Computer Animation/Assignment 3/Assignment 03 - Base Code/cmake-build-debug"
+			"value" : "d:/30220749/Courses/Computer Animation/Assignment 3/Inverse-Kinematics/cmake-build-debug"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -587,7 +587,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "D:/30220749/Courses/Computer Animation/Assignment 3/Assignment 03 - Base Code/cmake-build-debug/CMakeFiles/pkgRedirects"
+			"value" : "D:/30220749/Courses/Computer Animation/Assignment 3/Inverse-Kinematics/cmake-build-debug/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -671,7 +671,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "D:/30220749/Courses/Computer Animation/Assignment 3/Assignment 03 - Base Code"
+			"value" : "D:/30220749/Courses/Computer Animation/Assignment 3/Inverse-Kinematics"
 		},
 		{
 			"name" : "CMAKE_INSTALL_BINDIR",
@@ -1655,7 +1655,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "D:/30220749/Courses/Computer Animation/Assignment 3/Assignment 03 - Base Code/cmake-build-debug/libs/glfw"
+			"value" : "D:/30220749/Courses/Computer Animation/Assignment 3/Inverse-Kinematics/cmake-build-debug/libs/glfw"
 		},
 		{
 			"name" : "GLFW_BUILD_DOCS",
@@ -1727,7 +1727,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "D:/30220749/Courses/Computer Animation/Assignment 3/Assignment 03 - Base Code/libs/glfw"
+			"value" : "D:/30220749/Courses/Computer Animation/Assignment 3/Inverse-Kinematics/libs/glfw"
 		},
 		{
 			"name" : "GLFW_USE_HYBRID_HPG",
@@ -1867,7 +1867,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "D:/30220749/Courses/Computer Animation/Assignment 3/Assignment 03 - Base Code/cmake-build-debug"
+			"value" : "D:/30220749/Courses/Computer Animation/Assignment 3/Inverse-Kinematics/cmake-build-debug"
 		},
 		{
 			"name" : "a3_base_IS_TOP_LEVEL",
@@ -1891,7 +1891,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "D:/30220749/Courses/Computer Animation/Assignment 3/Assignment 03 - Base Code"
+			"value" : "D:/30220749/Courses/Computer Animation/Assignment 3/Inverse-Kinematics"
 		}
 	],
 	"kind" : "cache",

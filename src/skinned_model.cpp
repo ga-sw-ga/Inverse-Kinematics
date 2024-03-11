@@ -49,22 +49,33 @@ namespace skinning {
 		};
 	}
 
-	std::vector<glm::vec3> SkinnedModel::skinnedVertexPositions(
-		const std::vector<glm::mat4>& bone_rest_transformations
-		, const std::vector<glm::mat4>& bone_posed_transformations
-	) const {
-		std::vector<glm::vec3> ret;
+    std::vector<glm::vec3> SkinnedModel::skinnedVertexPositions(
+            const std::vector<glm::mat4>& bone_rest_transformations,
+            const std::vector<glm::mat4>& bone_posed_transformations
+    ) const {
+        std::vector<glm::vec3> ret;
 
-		// TODO: Apply the linear blend skinning using the rest and pose transformations 
-		// instead of a copy of the rest poses
-		ret.reserve(vertices.size());
-		for (const Vertex& v : vertices)
-			ret.push_back(v.rest_position);
+        // Apply linear blend skinning using the rest and pose transformations
+        ret.reserve(vertices.size());
+        for (const Vertex& v : vertices) {
+            glm::vec3 skinned_position(0.0f);
 
-		return ret;
-	}
+            for (const Vertex::BoneWeight& bw : v.bone_weights) {
+                const glm::mat4& rest_transform = bone_rest_transformations[bw.bone_id];
+                const glm::mat4& posed_transform = bone_posed_transformations[bw.bone_id];
 
-	std::optional<SkinnedModel> SkinnedModel::loadFromFile(std::string const& filepath) {
+                // Calculate the skinned position using linear blend skinning
+                skinned_position += bw.w * glm::vec3(posed_transform * glm::inverse(rest_transform) * glm::vec4(v.rest_position, 1.0f));
+            }
+
+            ret.push_back(skinned_position);
+        }
+
+        return ret;
+    }
+
+
+    std::optional<SkinnedModel> SkinnedModel::loadFromFile(std::string const& filepath) {
 				SkinnedModel model;
 
 		std::ifstream file(filepath);
